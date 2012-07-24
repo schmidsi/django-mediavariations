@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes import generic
 from django.db import models
@@ -12,7 +14,7 @@ class Variation(models.Model):
     """
 
     spec = models.CharField(max_length=100)
-    options = models.TextField(blank=True)
+    options = models.TextField(default="{}")
 
     file = models.FileField(blank=True, upload_to="mediavariations/%Y/%m/")
 
@@ -21,9 +23,11 @@ class Variation(models.Model):
     content_object = generic.GenericForeignKey('content_type', 'object_id')
     field = models.CharField(max_length=50)
 
+    progress = models.FloatField(null=True) # progress with null -> not started yet
+    processed = models.DateTimeField(null=True)
+
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
-
 
     def save(self, process=True, *args, **kwargs):
         """
@@ -42,16 +46,33 @@ class Variation(models.Model):
         if process:
             self.process()
 
+    def delete(self, *args, **kwargs):
+        """
+        ensure, that the files are also deleted
+        """
 
+        self.file.delete(save=False)
+
+        super(Variation, self).delete(*args, **kwargs)
 
     def process(self):
-        spec = get_object(self.spec)()
-        url_or_file = spec.process(self)
+        spec_class = get_object(self.spec)
+        self.spec_instance = spec_class(variation=self)
+        url_or_file = self.spec_instance.process()
 
         if isinstance(url_or_file, str):
             self.file.path = url_or_file
         else:
             self.file = url_or_file
 
+        self.progress = 0.0 # this indicates, that processing is started
         self.save(process=False)
 
+    def get_progress(self):
+        self.progress = self.spec_instance.get_progress()
+
+        if self.progress >= 1.0:
+            self.processed = datetime.now()
+
+        self.save(process=False)
+        return self.progress
