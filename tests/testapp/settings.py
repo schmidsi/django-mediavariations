@@ -74,6 +74,7 @@ INSTALLED_APPS = (
     'mediavariations',
     'feincms',
     'feincms.module.medialibrary',
+    'testapp',
 )
 
 LOGGING = {
@@ -106,3 +107,7 @@ MEDIAVARIATIONS_SPECS =  {
     'blitline' : 'mediavariations.contrib.blitline.specs.Generic',
     'pdf2jpg' : 'mediavariations.contrib.blitline.specs.Pdf2Jpeg',
 }
+
+MEDIAVARIATIONS_FEINCMS_ADMINACTION_APPLY_SPECS = (
+    'mediavariations.contrib.pypdf.specs.PageRange',
+)

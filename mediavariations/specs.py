@@ -12,9 +12,11 @@ class Base(object):
         for key, value in kwargs.iteritems():
             setattr(self, key, value)
 
+        print self.original
+
         if hasattr(self, 'variation'):
-            self.original = getattr(self, 'original',
-                getattr(self.variation.content_object, self.variation.field))
+            if not hasattr(self, 'original'):
+                self.original = getattr(self.variation.content_object, self.variation.field)
             self.path = getattr(self, 'path', os.path.split(self.original.name)[0])
             self.filename = getattr(self, 'filename', os.path.split(self.original.name)[1])
             self.basename = getattr(self, 'basename', os.path.splitext(self.filename)[0])
@@ -40,9 +42,7 @@ class Base(object):
             self.options.update(simplejson.loads(self.variation.options))
             return self.options
         except AttributeError:
-            raise NotImplementedError(
-                'A mediavariation spec currently needs a variation object associated with an'
-                'options attribute')
+            return self.defaults
 
     def get_options_hash(self):
         return hash(simplejson.dumps(self.get_options()))

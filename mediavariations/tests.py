@@ -96,7 +96,7 @@ class PdfTest(TestCase):
             content_object = self.pdf,
             spec = 'mediavariations.contrib.pypdf.specs.PageRange',
             options = simplejson.dumps({
-                'start' : 1,
+                'start' : 0,
                 'stop' : 1
             })
         )

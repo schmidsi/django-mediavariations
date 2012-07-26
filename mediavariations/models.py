@@ -58,12 +58,7 @@ class Variation(models.Model):
     def process(self):
         spec_class = get_object(self.spec)
         self.spec_instance = spec_class(variation=self)
-        url_or_file = self.spec_instance.process()
-
-        if isinstance(url_or_file, str):
-            self.file.path = url_or_file
-        else:
-            self.file = url_or_file
+        self.file = self.spec_instance.process()
 
         self.progress = 0.0 # this indicates, that processing is started
         self.save(process=False)
