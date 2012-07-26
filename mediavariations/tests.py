@@ -6,13 +6,14 @@ from django.core.files import File
 from django.core.files.images import get_image_dimensions
 from django.contrib.contenttypes.models import ContentType
 from django.test import TestCase
+from django.utils import simplejson
 
 from feincms.module.medialibrary.models import MediaFile
 
 from mediavariations.models import Variation
 
 
-class BindingTest(TestCase):
+class BlitlineTest(TestCase):
     def setUp(self):
         self.mediafile = MediaFile(file=File(open('testapp/fixtures/elephant_test_image.jpeg')))
         self.mediafile.save()
@@ -70,4 +71,39 @@ class BindingTest(TestCase):
         basename, ext = os.path.splitext(filename)
         
         self.assertTrue(basename in self.variated_url)
+
+
+class PdfTest(TestCase):
+    def setUp(self):
+        self.pdf = MediaFile(file=File(open('testapp/fixtures/rst-cheatsheet.pdf')))
+        self.pdf.save()
+
+    def tearDown(self):
+        pdf_variations = Variation.objects.filter(
+            content_type = ContentType.objects.get_for_model(self.pdf),
+            object_id = self.pdf.pk
+        )
+
+        for variation in pdf_variations:
+            variation.delete()
+
+        self.pdf.delete()
+
+    def test_page_range(self):
+        from pyPdf import PdfFileReader
+
+        self.variation = Variation(
+            content_object = self.pdf,
+            spec = 'mediavariations.contrib.pypdf.specs.PageRange',
+            options = simplejson.dumps({
+                'start' : 1,
+                'stop' : 1
+            })
+        )
+        self.variation.save()
+
+        reader = PdfFileReader(self.variation.file.file)
+
+        self.assertEqual(reader.getNumPages(), 1)
+
 
