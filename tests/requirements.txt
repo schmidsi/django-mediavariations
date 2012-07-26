@@ -1,0 +1,8 @@
+Django==1.4
+FeinCMS==1.6.2
+PIL==1.1.7
+Pygments==1.5
+boto==2.5.2
+bpython==0.11
+python-dateutil==2.1
+six==1.1.0

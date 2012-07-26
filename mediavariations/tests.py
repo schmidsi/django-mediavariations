@@ -14,7 +14,7 @@ from mediavariations.models import Variation
 
 class BindingTest(TestCase):
     def setUp(self):
-        self.mediafile = MediaFile(file=File(open('mediavariations/fixtures/elephant_test_image.jpg')))
+        self.mediafile = MediaFile(file=File(open('testapp/fixtures/elephant_test_image.jpeg')))
         self.mediafile.save()
 
     def tearDown(self):
