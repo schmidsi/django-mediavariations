@@ -12,8 +12,6 @@ class Base(object):
         for key, value in kwargs.iteritems():
             setattr(self, key, value)
 
-        print self.original
-
         if hasattr(self, 'variation'):
             if not hasattr(self, 'original'):
                 self.original = getattr(self.variation.content_object, self.variation.field)

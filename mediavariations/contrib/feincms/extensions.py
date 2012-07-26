@@ -27,5 +27,11 @@ def variations(cls, admin_cls):
 
     cls.add_to_class('variations', generic.GenericRelation(Variation))
 
+    class VariationInline(generic.GenericTabularInline):
+        model = Variation
+        extra = 0
+        readonly_fields = ('spec', 'options', 'field', 'progress', 'processed', 'created', 'modified')
+    admin_cls.inlines.append(VariationInline)
+
     for specpath in settings.FEINCMS_ADMINACTION_APPLY_SPECS:
         admin_cls.actions.append(_admin_action_factory(specpath))
